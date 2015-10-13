@@ -1,6 +1,8 @@
 ## RocksDB: A Persistent Key-Value Store for Flash and RAM Storage
 
 [![Build Status](https://travis-ci.org/facebook/rocksdb.svg?branch=master)](https://travis-ci.org/facebook/rocksdb)
+[![Windows Build Status](https://ci.appveyor.com/api/github/webhook?id=kcmrb1yip7wkls60)](https://ci.appveyor.com/api/github/webhook?id=kcmrb1yip7wkls60)
+
 
 RocksDB is developed and maintained by Facebook Database Engineering Team.
 It is built on earlier work on LevelDB by Sanjay Ghemawat (sanjay@google.com)
