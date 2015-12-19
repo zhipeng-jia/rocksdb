@@ -297,8 +297,9 @@ TEST_F(AutoRollLoggerTest, InfoLogLevel) {
     }
   }
   std::ifstream inFile(AutoRollLoggerTest::kLogFile.c_str());
-  size_t lines = std::count(std::istreambuf_iterator<char>(inFile),
-                         std::istreambuf_iterator<char>(), '\n');
+  size_t lines = static_cast<size_t>(
+      std::count(std::istreambuf_iterator<char>(inFile),
+                 std::istreambuf_iterator<char>(), '\n'));
   ASSERT_EQ(log_lines, lines);
   inFile.close();
 }

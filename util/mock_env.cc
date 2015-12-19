@@ -93,7 +93,7 @@ class MemFile {
     uint64_t end = std::min(start + 512, size_.load());
     MutexLock lock(&mutex_);
     for (uint64_t pos = start; pos < end; ++pos) {
-      data_[pos] = static_cast<char>(rnd_.Uniform(256));
+      data_[static_cast<size_t>(pos)] = static_cast<char>(rnd_.Uniform(256));
     }
   }
 
@@ -104,17 +104,17 @@ class MemFile {
     }
     const uint64_t available = Size() - offset;
     if (n > available) {
-      n = available;
+      n = static_cast<size_t>(available);
     }
     if (n == 0) {
       *result = Slice();
       return Status::OK();
     }
     if (scratch) {
-      memcpy(scratch, &(data_[offset]), n);
-      *result = Slice(scratch, n);
+      memcpy(scratch, &(data_[static_cast<size_t>(offset)]), n);
+      *result = Slice(scratch, static_cast<size_t>(n));
     } else {
-      *result = Slice(&(data_[offset]), n);
+      *result = Slice(&(data_[static_cast<size_t>(offset)]), n);
     }
     return Status::OK();
   }
@@ -194,7 +194,7 @@ class MockSequentialFile : public SequentialFile {
     if (pos_ > file_->Size()) {
       return Status::IOError("pos_ > file_->Size()");
     }
-    const size_t available = file_->Size() - pos_;
+    const size_t available = static_cast<size_t>(file_->Size() - pos_);
     if (n > available) {
       n = available;
     }
@@ -241,7 +241,8 @@ class MockWritableFile : public WritableFile {
   virtual Status Append(const Slice& data) override {
     uint64_t bytes_written = 0;
     while (bytes_written < data.size()) {
-      auto bytes = RequestToken(data.size() - bytes_written);
+      auto bytes = RequestToken(
+          data.size() - static_cast<size_t>(bytes_written));
       Status s = file_->Append(Slice(data.data() + bytes_written, bytes));
       if (!s.ok()) {
         return s;

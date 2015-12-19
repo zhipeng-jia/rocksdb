@@ -78,9 +78,9 @@ Status Truncate(Env* env, const std::string& filename, uint64_t length) {
     return s;
   }
 
-  std::unique_ptr<char[]> scratch(new char[length]);
+  std::unique_ptr<char[]> scratch(new char[static_cast<size_t>(length)]);
   rocksdb::Slice result;
-  s = orig_file->Read(length, &result, scratch.get());
+  s = orig_file->Read(static_cast<size_t>(length), &result, scratch.get());
 #ifdef OS_WIN
   orig_file.reset();
 #endif

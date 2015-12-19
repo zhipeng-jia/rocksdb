@@ -68,7 +68,7 @@ class DeleteSchedulerTest : public testing::Test {
     std::string file_path = dummy_files_dir_ + "/" + file_name;
     std::unique_ptr<WritableFile> f;
     env_->NewWritableFile(file_path, &f, EnvOptions());
-    std::string data(size, 'A');
+    std::string data(static_cast<size_t>(size), 'A');
     EXPECT_OK(f->Append(data));
     EXPECT_OK(f->Close());
     return file_path;

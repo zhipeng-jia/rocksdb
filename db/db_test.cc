@@ -74,7 +74,7 @@
 namespace rocksdb {
 
 static long TestGetTickerCount(const Options& options, Tickers ticker_type) {
-  return options.statistics->getTickerCount(ticker_type);
+  return static_cast<long>(options.statistics->getTickerCount(ticker_type));
 }
 
 #ifndef ROCKSDB_LITE

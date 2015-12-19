@@ -106,7 +106,7 @@ class LogTest : public ::testing::TestWithParam<int> {
         return Status::NotFound("in-memory file skipepd past end");
       }
 
-      contents_.remove_prefix(n);
+      contents_.remove_prefix(static_cast<size_t>(n));
 
       return Status::OK();
     }

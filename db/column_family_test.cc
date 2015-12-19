@@ -375,7 +375,7 @@ class ColumnFamilyTest : public testing::Test {
     Slice slice;
     while (size > 0) {
       uint64_t one = std::min(uint64_t(sizeof(buffer)), size);
-      ASSERT_OK(srcfile->Read(one, &slice, buffer));
+      ASSERT_OK(srcfile->Read(static_cast<size_t>(one), &slice, buffer));
       ASSERT_OK(destfile->Append(slice));
       size -= slice.size();
     }

@@ -431,7 +431,7 @@ class StringEnv : public EnvWrapper {
     explicit StringSink(std::string* contents)
         : WritableFile(), contents_(contents) {}
     virtual Status Truncate(uint64_t size) override {
-      contents_->resize(size);
+      contents_->resize(static_cast<size_t>(size));
       return Status::OK();
     }
     virtual Status Close() override { return Status::OK(); }

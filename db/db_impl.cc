@@ -4225,7 +4225,7 @@ Status DBImpl::WriteImpl(const WriteOptions& write_options,
 
   if (status.ok()) {
       int total_count = 0;
-      uint64_t total_byte_size = 0;
+      size_t total_byte_size = 0;
       for (auto b : write_batch_group) {
         total_count += WriteBatchInternal::Count(b);
         total_byte_size = WriteBatchInternal::AppendedByteSize(

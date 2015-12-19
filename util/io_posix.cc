@@ -309,10 +309,12 @@ Status PosixMmapFile::MapNewRegion() {
   // we can't fallocate with FALLOC_FL_KEEP_SIZE here
   if (allow_fallocate_) {
     IOSTATS_TIMER_GUARD(allocate_nanos);
-    int alloc_status = fallocate(fd_, 0, file_offset_, map_size_);
+    int alloc_status = fallocate(fd_, 0, static_cast<off_t>(file_offset_),
+                                 map_size_);
     if (alloc_status != 0) {
       // fallback to posix_fallocate
-      alloc_status = posix_fallocate(fd_, file_offset_, map_size_);
+      alloc_status = posix_fallocate(fd_, static_cast<off_t>(file_offset_),
+                                     map_size_);
     }
     if (alloc_status != 0) {
       return Status::IOError("Error allocating space to file : " + filename_ +
@@ -322,7 +324,7 @@ Status PosixMmapFile::MapNewRegion() {
 
   TEST_KILL_RANDOM("PosixMmapFile::Append:1", rocksdb_kill_odds);
   void* ptr = mmap(nullptr, map_size_, PROT_READ | PROT_WRITE, MAP_SHARED, fd_,
-                   file_offset_);
+                   static_cast<off_t>(file_offset_));
   if (ptr == MAP_FAILED) {
     return Status::IOError("MMap failed on " + filename_);
   }
@@ -416,7 +418,7 @@ Status PosixMmapFile::Close() {
     s = IOError(filename_, errno);
   } else if (unused > 0) {
     // Trim the extra space at the end of the file
-    if (ftruncate(fd_, file_offset_ - unused) < 0) {
+    if (ftruncate(fd_, static_cast<off_t>(file_offset_ - unused)) < 0) {
       s = IOError(filename_, errno);
     }
   }
@@ -546,7 +548,7 @@ Status PosixWritableFile::Close() {
     // NOTE(ljin): we probably don't want to surface failure as an IOError,
     // but it will be nice to log these errors.
     int dummy __attribute__((unused));
-    dummy = ftruncate(fd_, filesize_);
+    dummy = ftruncate(fd_, static_cast<off_t>(filesize_));
 #ifdef ROCKSDB_FALLOCATE_PRESENT
     // in some file systems, ftruncate only trims trailing space if the
     // new file size is smaller than the current size. Calling fallocate
@@ -561,8 +563,10 @@ Status PosixWritableFile::Close() {
     // correctness.
     IOSTATS_TIMER_GUARD(allocate_nanos);
     if (allow_fallocate_) {
-      fallocate(fd_, FALLOC_FL_KEEP_SIZE | FALLOC_FL_PUNCH_HOLE, filesize_,
-                block_size * last_allocated_block - filesize_);
+      fallocate(
+          fd_, FALLOC_FL_KEEP_SIZE | FALLOC_FL_PUNCH_HOLE,
+          static_cast<off_t>(filesize_),
+          static_cast<off_t>(block_size * last_allocated_block - filesize_));
     }
 #endif
   }
